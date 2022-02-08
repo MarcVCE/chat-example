@@ -96,7 +96,7 @@
 
     var isTyping = false;
     var isNotTyping;
-    document.getElementById('input').onkeypress = () => {
+    input.onkeypress = () => {
       sendIsTypingToUser()
       if (isNotTyping != undefined){
         clearTimeout(isNotTyping);
