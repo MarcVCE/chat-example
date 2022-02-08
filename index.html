@@ -96,13 +96,16 @@
 
     var isTyping = false;
     var isNotTyping;
-    input.onkeypress = () => {
+    
+    function isOrNotIsTypying() {
       sendIsTypingToUser()
       if (isNotTyping != undefined){
         clearTimeout(isNotTyping);
       }  
       isNotTyping = setTimeout(sendIsNotTyping, 900);
-    };
+    }
+
+    input.addEventListener("keypress", isOrNotIsTypying);
 
     function sendIsTypingToUser() {
       if (!isTyping) {
