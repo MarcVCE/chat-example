@@ -10,13 +10,17 @@
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
     }
 
-    #form {
-      background: rgba(0, 0, 0, 0.15);
-      padding: 0.25rem;
+    .messageArea {
       position: fixed;
       bottom: 0;
       left: 0;
       right: 0;
+      font-size: 1rem;
+    }
+
+    #form {
+      background: rgba(0, 0, 0, 0.15);
+      padding: 0.25rem;
       display: flex;
       height: 3rem;
       box-sizing: border-box;
@@ -63,12 +67,15 @@
 
 <body>
   <ul id="messages"></ul>
-  <form id="form" action="">
-    <input id="input" autocomplete="off" /><button>Send</button>
-    <input id="username" autocomplete="off" /><button>Username</button>
-    <button onclick="socket.close();">Close</button>
+  <div class="messageArea">
+    <div id="user_typing"></div>
+    <form id="form" action="">
+      <input id="input" autocomplete="off" /><button>Send</button>
+      <input id="username" autocomplete="off" /><button>Username</button>
+      <button onclick="socket.close();">Close</button>
 
-  </form>
+    </form>
+  </div>
   <script src="/socket.io/socket.io.js"></script>
 
 
@@ -79,6 +86,7 @@
     var form = document.getElementById('form');
     var input = document.getElementById('input');
     var username = document.getElementById('username');
+    const divUserTyping = document.getElementById('user_typing');
 
     form.addEventListener('submit', function (e) {
       e.preventDefault();
@@ -93,17 +101,25 @@
       item.textContent = msg;
       messages.appendChild(item);
       window.scrollTo(0, document.body.scrollHeight);
+      divUserTyping.innerHTML = "";
     });
 
+    socket.on('user typing', function (msg) {
+      divUserTyping.innerHTML = msg;
+    });
+
+    socket.on('user not typing', function (msg) {
+      divUserTyping.innerHTML = msg;
+    });
 
     var isTyping = false;
     var isNotTyping;
-    
+
     function isOrNotIsTyping() {
       sendIsTypingToUser()
-      if (isNotTyping != undefined){
+      if (isNotTyping != undefined) {
         clearTimeout(isNotTyping);
-      }  
+      }
       isNotTyping = setTimeout(sendIsNotTyping, 900);
     }
 
@@ -111,13 +127,13 @@
 
     function sendIsTypingToUser() {
       if (!isTyping) {
-        console.log(`${username.value} is typing...`);
+        socket.emit('user typing', `${username.value} is typing...`);
         isTyping = true;
       }
     }
-    
+
     function sendIsNotTyping() {
-      console.log(`${username.value} is not typing...`);
+      socket.emit('user not typing', ` `);
       isTyping = false;
     }
 
